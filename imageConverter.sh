@@ -24,7 +24,44 @@ kill -9 $$
 fi
 ###
 ##
+if [ -z "$1" ]
+then
+busybox echo -e "Folder tidak didefinisikan\n### Akan memeriksa folder $fold"
 find $fold -name "*.jpg" -type f > $fold/jpg.log
+fi
+
+if [ ! -z "$1" ]
+then
+echo -n "$1" > $fold/cekpath
+if [ -z "$(cat $fold/cekpath|grep "/")" ]
+then
+if [ ! -d "$fold/$1" ]
+then
+echo "Folder $1 tidak ada atau ejaan salah"
+kill -9 $$
+fi
+if [ -d "$fold/$(basename $1)" ]
+then
+find "$fold/$(basename $1)" -name "*.jpg" -type f > $fold/jpg.log
+fi
+fi
+
+if [ ! -z "$(cat $fold/cekpath|grep "/")" ]
+then
+if [ ! -d "$(dirname $1)/$(basename $1)" ]
+then
+busybox echo -e "\nFolder tidak ada atau salah ejaan.."
+kill -9 $$
+fi
+if [ -d "$(dirname $1)/$(basename $1)" ]
+then
+find $@ -name "*.jpg" -type f > $fold/jpg.log
+fi
+fi
+fi
+
+
+###
 if [ -z "$(cat $fold/jpg.log)" ]
 then
 echo "Gak ada gambar di $fold"
